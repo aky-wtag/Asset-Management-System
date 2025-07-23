@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ams
+    username: admin
+    password: 12345
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  application:
+    name: Asset Management System
+
+server:
+  port: 2599
+
+logging:
+  level:
+    org.springframework: INFO
+    com.company.ams: DEBUG
