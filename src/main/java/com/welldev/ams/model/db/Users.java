@@ -30,6 +30,12 @@ public class Users extends BaseDomain implements UserDetails {
   private String department;
 
   @Override
+  @JsonIgnore
+  public String getUsername() {
+    return email;
+  }
+
+  @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     return roles.stream()
         .map(role -> new SimpleGrantedAuthority(role.getName()))

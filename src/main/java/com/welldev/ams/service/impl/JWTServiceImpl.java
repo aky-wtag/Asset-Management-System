@@ -59,6 +59,16 @@ public class JWTServiceImpl implements JWTService {
     return Jwts.builder()
         .setSubject(userDetails.getEmail())
         .setIssuedAt(new Date(System.currentTimeMillis()))
+        .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
+        .signWith(getSignInKey(), SignatureAlgorithm.HS256) // Use the Key object
+        .compact();
+  }
+
+  @Override
+  public String generateRefreshToken(Users userDetails) {
+    return Jwts.builder()
+        .setSubject(userDetails.getEmail())
+        .setIssuedAt(new Date(System.currentTimeMillis()))
         .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 2)) // 2 hours
         .signWith(getSignInKey(), SignatureAlgorithm.HS256) // Use the Key object
         .compact();

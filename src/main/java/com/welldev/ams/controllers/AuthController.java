@@ -1,5 +1,6 @@
 package com.welldev.ams.controllers;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.welldev.ams.model.request.AuthResponse;
 import com.welldev.ams.model.request.LogInDTO;
+import com.welldev.ams.model.response.BaseResponse;
 import com.welldev.ams.service.AuthService;
 
 @RestController
@@ -19,8 +21,13 @@ public class AuthController {
   }
 
   @PostMapping("/login")
-  public AuthResponse createAuthenticationToken(@RequestBody LogInDTO logInDTO) throws Exception {
+  public ResponseEntity<BaseResponse> createAuthenticationToken(@RequestBody LogInDTO logInDTO) throws Exception {
     return authService.signIn(logInDTO.getEmail(), logInDTO.getPassword());
+  }
+
+  @PostMapping("/logout")
+  public AuthResponse logout() throws Exception {
+    return authService.logout();
   }
 
 }
