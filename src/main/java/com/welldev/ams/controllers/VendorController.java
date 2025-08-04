@@ -3,6 +3,7 @@ package com.welldev.ams.controllers;
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,12 +26,14 @@ public class VendorController {
     this.vendorService = vendorService;
   }
 
-  @PostMapping("/create-vendor")
+  @PostMapping("/create")
+  @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> createVendor(@Valid @RequestBody VendorDTO vendorDTO) {
     return vendorService.createVendor(vendorDTO);
   }
 
-  @GetMapping("/get-vendors")
+  @GetMapping("/getAll")
+  @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> getRoles(
       @RequestParam(required = false) String name,
       @RequestParam(required = false) String contactPerson,
@@ -43,17 +46,20 @@ public class VendorController {
     return vendorService.getVendors(name, contactPerson, email, phone, page, pageSize, sortBy, order);
   }
 
-  @GetMapping("/get-vendor")
+  @GetMapping("/get")
+  @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> getVendor(@RequestParam String vendorId) {
     return vendorService.getVendor(vendorId);
   }
 
-  @PutMapping("/update-vendor")
+  @PutMapping("/update")
+  @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> updateVendor(@Valid @RequestBody VendorDTO vendorDTO, @RequestParam String vendorId) {
     return vendorService.updateVendor(vendorDTO,vendorId);
   }
 
-  @DeleteMapping("/delete-vendor")
+  @DeleteMapping("/delete")
+  @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> deleteVendor(@RequestParam String vendorId) {
     return vendorService.deleteVendor(vendorId);
   }

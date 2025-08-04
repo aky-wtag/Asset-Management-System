@@ -13,4 +13,5 @@ import com.welldev.ams.model.db.Asset;
 public interface AssetRepository extends JpaRepository<Asset, UUID>, JpaSpecificationExecutor<Asset> {
   Page<Asset> findByActiveAndDeleted(Boolean active, Boolean deleted, Pageable pageable);
   Optional<Asset> findByIdAndActiveAndDeleted(UUID id, Boolean active, Boolean deleted);
+  Optional<Asset> findByIdAndDeleted(UUID id, Boolean deleted);
 }

@@ -89,7 +89,7 @@ public class CategoryServiceImpl implements CategoryService {
   @Override
   public ResponseEntity<BaseResponse> getCategory(String categoryId) {
     try {
-      Optional<Category> category = categoryRepository.findById(UUID.fromString(categoryId));
+      Optional<Category> category = categoryRepository.findByIdAndDeleted(UUID.fromString(categoryId), false);
       return category.map(value -> ResponseEntity.ok()
               .body(utils.generateResponse(value, true, HttpStatus.OK.value(), "")))
           .orElseGet(() -> ResponseEntity.notFound()

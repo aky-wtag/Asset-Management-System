@@ -3,6 +3,7 @@ package com.welldev.ams.model.request;
 import java.time.ZonedDateTime;
 
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
@@ -17,7 +18,7 @@ public class AssetDTO {
   private String vendor;
   @NotEmpty(message = "Location Can Not Be Empty")
   private String location;
-  @NotEmpty(message = "Purchase Date Can Not Be Empty")
+  @NotNull(message = "Purchase Date Can Not Be Empty")
   private ZonedDateTime purchaseDate;
   @NotEmpty(message = "Status Can Not Be Empty")
   private String status;

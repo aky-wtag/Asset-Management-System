@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.welldev.ams.model.request.RoleDTO;
 import com.welldev.ams.model.request.UserDTO;
 import com.welldev.ams.model.response.BaseResponse;
 import com.welldev.ams.service.UsersService;
@@ -26,13 +25,13 @@ public class UserController {
   public UserController(UsersService usersService) {
     this.usersService = usersService;
   }
-  @PostMapping("/create-user")
+  @PostMapping("/create")
   @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> createUser(@Valid @RequestBody UserDTO userDTO) {
     return usersService.createUser(userDTO);
   }
 
-  @GetMapping("/get-users")
+  @GetMapping("/getAll")
   @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> getRoles(
       @RequestParam(required = false) String username,
@@ -45,19 +44,19 @@ public class UserController {
     return usersService.getUsers(username, email, department, page, pageSize, sortBy, order);
   }
 
-  @GetMapping("/get-user")
+  @GetMapping("/get")
   @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> getUser(@RequestParam String userId) {
     return usersService.getUser(userId);
   }
 
-  @PutMapping("/update-user")
+  @PutMapping("/update")
   @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> updateUser(@Valid @RequestBody UserDTO userDTO, @RequestParam String userId) {
     return usersService.updateUser(userDTO,userId);
   }
 
-  @DeleteMapping("/delete-user")
+  @DeleteMapping("/delete")
   @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> deleteUser(@RequestParam String userId) {
     return usersService.deleteUser(userId);

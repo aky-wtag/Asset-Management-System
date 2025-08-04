@@ -4,6 +4,7 @@ package com.welldev.ams.controllers;
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,12 +28,14 @@ public class CategoryController {
     this.categoryService = categoryService;
   }
 
-  @PostMapping("/create-category")
+  @PostMapping("/create")
+  @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> createCategory(@Valid @RequestBody CategoryDTO categoryDTO) {
     return categoryService.createCategory(categoryDTO);
   }
 
   @GetMapping("/get-categories")
+  @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> getCategories(
       @RequestParam(required = false) String categoryName,
       @RequestParam(defaultValue = "0") int page,
@@ -42,17 +45,20 @@ public class CategoryController {
     return categoryService.getCategories(categoryName, page, pageSize, sortBy, order);
   }
 
-  @GetMapping("/get-category")
+  @GetMapping("/get")
+  @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> getCategory(@RequestParam String assignmentId) {
     return categoryService.getCategory(assignmentId);
   }
 
-  @PutMapping("/update-category")
+  @PutMapping("/update")
+  @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> updateCategory(@Valid @RequestBody CategoryDTO categoryDTO, @RequestParam String categoryId) {
     return categoryService.updateCategory(categoryDTO,categoryId);
   }
 
-  @DeleteMapping("/delete-category")
+  @DeleteMapping("/delete")
+  @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> deleteCategory(@RequestParam String categoryId) {
     return categoryService.deleteCategory(categoryId);
   }

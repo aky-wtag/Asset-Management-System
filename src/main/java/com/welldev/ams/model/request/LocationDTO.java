@@ -13,6 +13,8 @@ public class LocationDTO {
   private String roomNumber;
   @NotEmpty(message = "City Can Not Be Empty")
   private String city;
+  @NotEmpty(message = "Name Can Not Be Empty")
+  private String name;
   private Boolean active = true;
   private Boolean deleted = false;
 }

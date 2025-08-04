@@ -86,6 +86,9 @@ public class VendorServiceImpl implements VendorService {
           predicates.add(cb.equal(root.get("phone"), phone));
         }
 
+        predicates.add(cb.equal(root.get("active"), true));
+        predicates.add(cb.equal(root.get("deleted"), false));
+
         return cb.and(predicates.toArray(new Predicate[0]));
       };
       Page<Vendor> vendorList = vendorRepository.findAll(spec, PageRequest.of(page, size));

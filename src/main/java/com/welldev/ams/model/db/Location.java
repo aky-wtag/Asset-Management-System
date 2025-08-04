@@ -12,4 +12,5 @@ public class Location extends BaseDomain {
   private String floor;
   private String roomNumber;
   private String city;
+  private String name;
 }

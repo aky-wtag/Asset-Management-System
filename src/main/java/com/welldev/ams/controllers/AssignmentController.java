@@ -5,6 +5,7 @@ import java.time.ZonedDateTime;
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,12 +29,14 @@ public class AssignmentController {
     this.assignmentService = assignmentService;
   }
 
-  @PostMapping("/create-assignment")
+  @PostMapping("/create")
+  @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> createAssignment(@Valid @RequestBody AssignmentDTO assignmentDTO) {
     return assignmentService.createAssignment(assignmentDTO);
   }
 
-  @GetMapping("/get-assignments")
+  @GetMapping("/getAll")
+  @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> getAssetRequests(
       @RequestParam(required = false) String assetId,
       @RequestParam(required = false) String userId,
@@ -49,17 +52,20 @@ public class AssignmentController {
     return assignmentService.getAssignments(assetId, userId, remarks, assignedDateFrom, assignedDateTo, returnDateFrom, returnDateTo, page, pageSize, sortBy, order);
   }
 
-  @GetMapping("/get-assignment")
+  @GetMapping("/get")
+  @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> getAssignment(@RequestParam String assignmentId) {
     return assignmentService.getAssignment(assignmentId);
   }
 
-  @PutMapping("/update-assignment")
+  @PutMapping("/update")
+  @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> updateAssignment(@Valid @RequestBody AssignmentDTO assignmentDTO, @RequestParam String assignmentId) {
     return assignmentService.updateAssignment(assignmentDTO,assignmentId);
   }
 
-  @DeleteMapping("/delete-assignment")
+  @DeleteMapping("/delete")
+  @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> deleteAssignment(@RequestParam String assignmentId) {
     return assignmentService.deleteAssignment(assignmentId);
   }

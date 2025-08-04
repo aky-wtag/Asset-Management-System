@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
 //import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,14 +29,14 @@ public class AssetController {
     this.assetService = assetService;
   }
 
-  @PostMapping("/create-asset")
-//  @PreAuthorize("hasAnyRole('ADMIN')")
+  @PostMapping("/create")
+  @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> createAsset(@Valid @RequestBody AssetDTO assetDTO) {
     return assetService.createAsset(assetDTO);
   }
 
-  @GetMapping("/get-assets")
-//  @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+  @GetMapping("/getAll")
+  @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
   ResponseEntity<BaseResponse> getAssetRequests(
       @RequestParam(required = false) String serialNumber,
       @RequestParam(required = false) String category,
@@ -52,19 +53,20 @@ public class AssetController {
     return assetService.getAssets(serialNumber, category, vendor, location, purchaseDateFrom, purchaseDateTo, status, page, pageSize, sortBy, order);
   }
 
-  @GetMapping("/get-asset")
+  @GetMapping("/get")
+  @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
   ResponseEntity<BaseResponse> getAssetRequest(@RequestParam String assetRequestId) {
     return assetService.getAsset(assetRequestId);
   }
 
-  @PutMapping("/update-asset")
-//  @PreAuthorize("hasAnyRole('ADMIN')")
+  @PutMapping("/update")
+  @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> updateAssetRequest(@Valid @RequestBody AssetDTO assetDTO, @RequestParam String assetRequestId) {
     return assetService.updateAsset(assetDTO,assetRequestId);
   }
 
-  @DeleteMapping("/delete-asset")
-//  @PreAuthorize("hasAnyRole('ADMIN')")
+  @DeleteMapping("/delete")
+  @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> deleteAssetRequest(@RequestParam String assetRequestId) {
     return assetService.deleteAsset(assetRequestId);
   }

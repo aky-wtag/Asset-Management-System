@@ -61,7 +61,7 @@ public class AssetServiceImpl implements AssetService {
   @Override
   public ResponseEntity<BaseResponse> updateAsset(AssetDTO assetDTO, String assetId) {
     try {
-      Optional<Asset> locationEntity = assetRepository.findByIdAndActiveAndDeleted(UUID.fromString(assetId), true, false);
+      Optional<Asset> locationEntity = assetRepository.findByIdAndDeleted(UUID.fromString(assetId), false);
       if(locationEntity.isPresent()) {
         assetMapper.updateCategoryEntity(assetDTO, locationEntity.get(), categoryRepository, vendorRepository, locationRepository);
         Asset saveEntity = assetRepository.save(locationEntity.get());

@@ -16,6 +16,8 @@ spring:
 
 server:
   port: 2599
+  servlet:
+    context-path: /ams
 
 logging:
   level:

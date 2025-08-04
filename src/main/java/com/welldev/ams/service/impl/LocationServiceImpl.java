@@ -83,6 +83,8 @@ public class LocationServiceImpl implements LocationService {
           if (city != null && !city.isEmpty()) {
             predicates.add(cb.equal(root.get("city"), city));
           }
+         predicates.add(cb.equal(root.get("active"), true));
+         predicates.add(cb.equal(root.get("deleted"), false));
 
           return cb.and(predicates.toArray(new Predicate[0]));
         };

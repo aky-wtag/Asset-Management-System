@@ -5,6 +5,7 @@ import java.time.ZonedDateTime;
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,12 +28,14 @@ public class AssetRequestController {
     this.assetRequestService = assetRequestService;
   }
 
-  @PostMapping("/create-request")
+  @PostMapping("/create")
+  @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
   ResponseEntity<BaseResponse> createAssetRequest(@Valid @RequestBody AssetRequestDTO assetRequestDTO) {
     return assetRequestService.createAssetRequest(assetRequestDTO);
   }
 
-  @GetMapping("/get-requests")
+  @GetMapping("/getAll")
+  @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
   ResponseEntity<BaseResponse> getAssetRequests(
       @RequestParam(required = false) String requestedBy,
       @RequestParam(required = false) String assetName,
@@ -46,17 +49,20 @@ public class AssetRequestController {
     return assetRequestService.getAssetRequests(requestedBy, assetName, status, requestDateFrom, requestDateTo, page, pageSize, sortBy, order);
   }
 
-  @GetMapping("/get-request")
+  @GetMapping("/get")
+  @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
   ResponseEntity<BaseResponse> getAssetRequest(@RequestParam String assetRequestId) {
     return assetRequestService.getAssetRequest(assetRequestId);
   }
 
-  @PutMapping("/update-request")
+  @PutMapping("/update")
+  @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
   ResponseEntity<BaseResponse> updateAssetRequest(@Valid @RequestBody AssetRequestDTO assetRequestDTO, @RequestParam String assetRequestId) {
     return assetRequestService.updateAssetRequest(assetRequestDTO,assetRequestId);
   }
 
-  @DeleteMapping("/delete-request")
+  @DeleteMapping("/delete")
+  @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
   ResponseEntity<BaseResponse> deleteAssetRequest(@RequestParam String assetRequestId) {
     return assetRequestService.deleteAssetRequest(assetRequestId);
   }

@@ -3,6 +3,7 @@ package com.welldev.ams.controllers;
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,12 +26,14 @@ public class LocationController {
     this.locationService = locationService;
   }
 
-  @PostMapping("/create-location")
+  @PostMapping("/create")
+  @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> createLocation(@Valid @RequestBody LocationDTO locationDTO) {
     return locationService.createLocation(locationDTO);
   }
 
-  @GetMapping("/get-locations")
+  @GetMapping("/getAll")
+  @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> getCategories(
       @RequestParam(required = false) String building,
       @RequestParam(required = false) String floor,
@@ -43,17 +46,20 @@ public class LocationController {
     return locationService.getLocations(building, floor, roomNumber, city, page, pageSize, sortBy, order);
   }
 
-  @GetMapping("/get-location")
+  @GetMapping("/get")
+  @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> getCategory(@RequestParam String locationId) {
     return locationService.getLocation(locationId);
   }
 
-  @PutMapping("/update-location")
+  @PutMapping("/update")
+  @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> updateCategory(@Valid @RequestBody LocationDTO locationDTO, @RequestParam String locationId) {
     return locationService.updateLocation(locationDTO,locationId);
   }
 
-  @DeleteMapping("/delete-location")
+  @DeleteMapping("/delete")
+  @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> deleteCategory(@RequestParam String locationId) {
     return locationService.deleteLocation(locationId);
   }
