@@ -17,10 +17,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.welldev.ams.model.db.Asset;
+import com.welldev.ams.model.db.AssetRequest;
 import com.welldev.ams.model.db.Assignment;
 import com.welldev.ams.model.mapper.AssignmentMapper;
 import com.welldev.ams.model.request.AssignmentDTO;
 import com.welldev.ams.model.response.BaseResponse;
+import com.welldev.ams.repositories.AssetRepository;
 import com.welldev.ams.repositories.AssignmentRepository;
 import com.welldev.ams.service.AssignmentService;
 import com.welldev.ams.utils.Utils;
@@ -29,19 +31,26 @@ import com.welldev.ams.utils.Utils;
 @Service
 public class AssignmentServiceImpl implements AssignmentService {
   private final AssignmentRepository assignmentRepository;
+  private final AssetRepository assetRepository;
   private final Utils utils;
   private final AssignmentMapper assignmentMapper;
 
-  public AssignmentServiceImpl(AssignmentRepository assignmentRepository, Utils utils, AssignmentMapper assignmentMapper)
+  public AssignmentServiceImpl(AssignmentRepository assignmentRepository, Utils utils, AssignmentMapper assignmentMapper, AssetRepository assetRepository)
   {
     this.assignmentRepository = assignmentRepository;
     this.utils = utils;
     this.assignmentMapper = assignmentMapper;
+    this.assetRepository = assetRepository;
   }
 
   @Override
   public ResponseEntity<BaseResponse> createAssignment(AssignmentDTO assignmentDTO) {
     try {
+      Asset asset = assetRepository.getReferenceById(UUID.fromString(assignmentDTO.getAssetId()));
+      if(!asset.getStatus()
+          .equalsIgnoreCase("available")){
+        return ResponseEntity.badRequest().body(utils.generateResponse(null, false, HttpStatus.BAD_REQUEST.value(), "Asset is "+ asset.getStatus()));
+      }
       Assignment saveEntity = assignmentRepository.save(assignmentMapper.toEntity(assignmentDTO));
       return ResponseEntity.ok().body(utils.generateResponse(saveEntity, true, HttpStatus.OK.value(), "Assignment Created Successfully."));
     }
