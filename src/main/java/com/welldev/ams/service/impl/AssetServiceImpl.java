@@ -12,15 +12,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.welldev.ams.exception.ResourceNotFoundException;
 import com.welldev.ams.model.db.Asset;
 import com.welldev.ams.model.mapper.AssetMapper;
 import com.welldev.ams.model.request.AssetDTO;
-import com.welldev.ams.model.response.BaseResponse;
 import com.welldev.ams.repositories.AssetRepository;
 import com.welldev.ams.repositories.CategoryRepository;
 import com.welldev.ams.repositories.LocationRepository;
