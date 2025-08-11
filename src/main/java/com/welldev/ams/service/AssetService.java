@@ -18,5 +18,5 @@ public interface AssetService {
 
   Optional<AssetDTO>  getAsset(String assetId);
 
-  boolean deleteAsset(String assetId);
+  void deleteAsset(String assetId);
 }

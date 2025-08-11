@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.welldev.ams.exception.ResourceNotFoundException;
 import com.welldev.ams.model.db.Asset;
 import com.welldev.ams.model.mapper.AssetMapper;
 import com.welldev.ams.model.request.AssetDTO;
@@ -106,14 +107,15 @@ public class AssetServiceImpl implements AssetService {
   }
 
   @Override
-  public boolean deleteAsset(String assetId) {
+  public void deleteAsset(String assetId) {
     Optional<Asset> asset = assetRepository.findByIdAndActiveAndDeleted(UUID.fromString(assetId), true, false);
     if (asset.isPresent()) {
       Asset toDelete = asset.get();
       toDelete.setDeleted(true);
       assetRepository.save(toDelete);
-      return true;
     }
-    return false;
+    else {
+      throw new ResourceNotFoundException("Asset not found with id " + assetId);
+    }
   }
 }

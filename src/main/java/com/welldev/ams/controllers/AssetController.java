@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-//import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,17 +40,11 @@ public class AssetController {
   @PostMapping
   @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> createAsset(@Valid @RequestBody AssetDTO assetDTO) {
-    try {
       AssetDTO savedAsset = assetService.createAsset(assetDTO);
-      return ResponseEntity.ok(
+      return ResponseEntity.status(HttpStatus.CREATED).body(
           utils.generateResponse(savedAsset, true, HttpStatus.OK.value(), "Asset Created Successfully.")
       );
-    } catch (Exception e) {
-      return ResponseEntity.internalServerError().body(
-          utils.generateResponse(null, false, HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage())
-      );
     }
-  }
 
   @GetMapping
   @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
@@ -68,68 +61,39 @@ public class AssetController {
       @RequestParam(defaultValue = "createdAt") String sortBy,
       @RequestParam(defaultValue = "desc") String order
   ) {
-    try {
       Page<AssetDTO> result = assetService.getAssets(
           serialNumber, category, vendor, location,
           purchaseDateFrom, purchaseDateTo, status,
           page, pageSize, sortBy, order
       );
       return ResponseEntity.ok(utils.generateResponse(result, true, HttpStatus.OK.value(), ""));
-    } catch (Exception e) {
-      return ResponseEntity.internalServerError()
-          .body(utils.generateResponse(null, false, HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-    }
   }
 
   @GetMapping("/{assetId}")
   @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
   ResponseEntity<BaseResponse> getAsset(@PathVariable String assetId) {
-    try {
       Optional<AssetDTO> assetDTO = assetService.getAsset(assetId);
       return assetDTO.map(dto -> ResponseEntity.ok(
               utils.generateResponse(dto, true, HttpStatus.OK.value(), "")
           ))
           .orElseGet(() -> ResponseEntity.notFound().build());
-    } catch (Exception e) {
-      log.error("Get Asset Error: {}", assetId, e);
-      return ResponseEntity.internalServerError().body(
-          utils.generateResponse(null, false, HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage())
-      );
-    }
   }
 
   @PutMapping("/{assetId}")
   @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> updateAssetRequest(@Valid @RequestBody AssetDTO assetDTO, @PathVariable String assetId) {
-    try {
       return assetService.updateAsset(assetDTO, assetId)
           .map(updated -> ResponseEntity.ok(
               utils.generateResponse(updated, true, HttpStatus.OK.value(), "Asset updated successfully.")
           ))
           .orElse(ResponseEntity.notFound().build());
-    } catch (Exception e) {
-      return ResponseEntity.internalServerError().body(
-          utils.generateResponse(null, false, HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage())
-      );
-    }
   }
 
   @DeleteMapping("/{assetId}")
   @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> deleteAsset(@PathVariable String assetId) {
-    try {
-      boolean deleted = assetService.deleteAsset(assetId);
-      if (deleted) {
-        return ResponseEntity.noContent().build();
-      } else {
-        return ResponseEntity.notFound().build();
-      }
-    } catch (Exception e) {
-      log.error("Delete Asset Error: {}", assetId, e);
-      return ResponseEntity.internalServerError().body(
-          utils.generateResponse(null, false, HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage())
-      );
-    }
+    assetService.deleteAsset(assetId);
+    return ResponseEntity.noContent().build();
   }
 
 }
