@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,13 +26,13 @@ public class UserController {
   public UserController(UsersService usersService) {
     this.usersService = usersService;
   }
-  @PostMapping("/create")
+  @PostMapping
   @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> createUser(@Valid @RequestBody UserDTO userDTO) {
     return usersService.createUser(userDTO);
   }
 
-  @GetMapping("/getAll")
+  @GetMapping
   @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> getRoles(
       @RequestParam(required = false) String username,
@@ -44,21 +45,21 @@ public class UserController {
     return usersService.getUsers(username, email, department, page, pageSize, sortBy, order);
   }
 
-  @GetMapping("/get")
+  @GetMapping("/{userId}")
   @PreAuthorize("hasAnyRole('ADMIN')")
-  ResponseEntity<BaseResponse> getUser(@RequestParam String userId) {
+  ResponseEntity<BaseResponse> getUser(@PathVariable String userId) {
     return usersService.getUser(userId);
   }
 
-  @PutMapping("/update")
+  @PutMapping("/{userId}")
   @PreAuthorize("hasAnyRole('ADMIN')")
-  ResponseEntity<BaseResponse> updateUser(@Valid @RequestBody UserDTO userDTO, @RequestParam String userId) {
+  ResponseEntity<BaseResponse> updateUser(@Valid @RequestBody UserDTO userDTO, @PathVariable String userId) {
     return usersService.updateUser(userDTO,userId);
   }
 
-  @DeleteMapping("/delete")
+  @DeleteMapping("/{userId}")
   @PreAuthorize("hasAnyRole('ADMIN')")
-  ResponseEntity<BaseResponse> deleteUser(@RequestParam String userId) {
+  ResponseEntity<BaseResponse> deleteUser(@PathVariable String userId) {
     return usersService.deleteUser(userId);
   }
 }

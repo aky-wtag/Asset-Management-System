@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,7 +21,7 @@ import com.welldev.ams.model.response.BaseResponse;
 import com.welldev.ams.service.AssetRequestService;
 
 @RestController
-@RequestMapping("/asset-request")
+@RequestMapping("/asset-requests")
 public class AssetRequestController {
   private final AssetRequestService assetRequestService;
 
@@ -28,13 +29,13 @@ public class AssetRequestController {
     this.assetRequestService = assetRequestService;
   }
 
-  @PostMapping("/create")
+  @PostMapping
   @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
   ResponseEntity<BaseResponse> createAssetRequest(@Valid @RequestBody AssetRequestDTO assetRequestDTO) {
     return assetRequestService.createAssetRequest(assetRequestDTO);
   }
 
-  @GetMapping("/getAll")
+  @GetMapping
   @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
   ResponseEntity<BaseResponse> getAssetRequests(
       @RequestParam(required = false) String requestedBy,
@@ -49,21 +50,21 @@ public class AssetRequestController {
     return assetRequestService.getAssetRequests(requestedBy, assetName, status, requestDateFrom, requestDateTo, page, pageSize, sortBy, order);
   }
 
-  @GetMapping("/get")
+  @GetMapping("/{assetRequestId}")
   @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-  ResponseEntity<BaseResponse> getAssetRequest(@RequestParam String assetRequestId) {
+  ResponseEntity<BaseResponse> getAssetRequest(@PathVariable String assetRequestId) {
     return assetRequestService.getAssetRequest(assetRequestId);
   }
 
-  @PutMapping("/update")
+  @PutMapping("/{assetRequestId}")
   @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-  ResponseEntity<BaseResponse> updateAssetRequest(@Valid @RequestBody AssetRequestDTO assetRequestDTO, @RequestParam String assetRequestId) {
+  ResponseEntity<BaseResponse> updateAssetRequest(@Valid @RequestBody AssetRequestDTO assetRequestDTO, @PathVariable String assetRequestId) {
     return assetRequestService.updateAssetRequest(assetRequestDTO,assetRequestId);
   }
 
-  @DeleteMapping("/delete")
+  @DeleteMapping("/{assetRequestId}")
   @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-  ResponseEntity<BaseResponse> deleteAssetRequest(@RequestParam String assetRequestId) {
+  ResponseEntity<BaseResponse> deleteAssetRequest(@PathVariable String assetRequestId) {
     return assetRequestService.deleteAssetRequest(assetRequestId);
   }
 }

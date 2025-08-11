@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,13 +27,13 @@ public class RoleController {
     this.roleService = roleService;
   }
 
-  @PostMapping("/create-role")
+  @PostMapping
   @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> createRole(@Valid @RequestBody RoleDTO roleDTO) {
     return roleService.createRole(roleDTO);
   }
 
-  @GetMapping("/get-roles")
+  @GetMapping
   @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> getRoles(
       @RequestParam(required = false) String roleName,
@@ -43,21 +44,21 @@ public class RoleController {
     return roleService.getRoles(roleName, page, pageSize, sortBy, order);
   }
 
-  @GetMapping("/get-role")
+  @GetMapping("/{roleId}")
   @PreAuthorize("hasAnyRole('ADMIN')")
-  ResponseEntity<BaseResponse> getRole(@RequestParam String roleId) {
+  ResponseEntity<BaseResponse> getRole(@PathVariable String roleId) {
     return roleService.getRole(roleId);
   }
 
-  @PutMapping("/update-role")
+  @PutMapping("/{roleId}")
   @PreAuthorize("hasAnyRole('ADMIN')")
-  ResponseEntity<BaseResponse> updateRole(@Valid @RequestBody RoleDTO roleDTO, @RequestParam String roleId) {
+  ResponseEntity<BaseResponse> updateRole(@Valid @RequestBody RoleDTO roleDTO, @PathVariable String roleId) {
     return roleService.updateRole(roleDTO,roleId);
   }
 
-  @DeleteMapping("/delete-role")
+  @DeleteMapping("/{roleId}")
   @PreAuthorize("hasAnyRole('ADMIN')")
-  ResponseEntity<BaseResponse> deleteRole(@RequestParam String roleId) {
+  ResponseEntity<BaseResponse> deleteRole(@PathVariable String roleId) {
     return roleService.deleteRole(roleId);
   }
 }

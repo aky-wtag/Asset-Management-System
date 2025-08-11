@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,13 +27,13 @@ public class VendorController {
     this.vendorService = vendorService;
   }
 
-  @PostMapping("/create")
+  @PostMapping
   @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> createVendor(@Valid @RequestBody VendorDTO vendorDTO) {
     return vendorService.createVendor(vendorDTO);
   }
 
-  @GetMapping("/getAll")
+  @GetMapping
   @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> getRoles(
       @RequestParam(required = false) String name,
@@ -46,21 +47,21 @@ public class VendorController {
     return vendorService.getVendors(name, contactPerson, email, phone, page, pageSize, sortBy, order);
   }
 
-  @GetMapping("/get")
+  @GetMapping("/{vendorId}")
   @PreAuthorize("hasAnyRole('ADMIN')")
-  ResponseEntity<BaseResponse> getVendor(@RequestParam String vendorId) {
+  ResponseEntity<BaseResponse> getVendor(@PathVariable String vendorId) {
     return vendorService.getVendor(vendorId);
   }
 
-  @PutMapping("/update")
+  @PutMapping("/{vendorId}")
   @PreAuthorize("hasAnyRole('ADMIN')")
-  ResponseEntity<BaseResponse> updateVendor(@Valid @RequestBody VendorDTO vendorDTO, @RequestParam String vendorId) {
+  ResponseEntity<BaseResponse> updateVendor(@Valid @RequestBody VendorDTO vendorDTO, @PathVariable String vendorId) {
     return vendorService.updateVendor(vendorDTO,vendorId);
   }
 
-  @DeleteMapping("/delete")
+  @DeleteMapping("/{vendorId}")
   @PreAuthorize("hasAnyRole('ADMIN')")
-  ResponseEntity<BaseResponse> deleteVendor(@RequestParam String vendorId) {
+  ResponseEntity<BaseResponse> deleteVendor(@PathVariable String vendorId) {
     return vendorService.deleteVendor(vendorId);
   }
 }

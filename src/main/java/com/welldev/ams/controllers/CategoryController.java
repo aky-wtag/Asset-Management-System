@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,13 +29,13 @@ public class CategoryController {
     this.categoryService = categoryService;
   }
 
-  @PostMapping("/create")
+  @PostMapping
   @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> createCategory(@Valid @RequestBody CategoryDTO categoryDTO) {
     return categoryService.createCategory(categoryDTO);
   }
 
-  @GetMapping("/get-categories")
+  @GetMapping
   @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> getCategories(
       @RequestParam(required = false) String categoryName,
@@ -45,21 +46,21 @@ public class CategoryController {
     return categoryService.getCategories(categoryName, page, pageSize, sortBy, order);
   }
 
-  @GetMapping("/get")
+  @GetMapping("/{categoryId}")
   @PreAuthorize("hasAnyRole('ADMIN')")
-  ResponseEntity<BaseResponse> getCategory(@RequestParam String assignmentId) {
-    return categoryService.getCategory(assignmentId);
+  ResponseEntity<BaseResponse> getCategory(@PathVariable String categoryId) {
+    return categoryService.getCategory(categoryId);
   }
 
-  @PutMapping("/update")
+  @PutMapping("/{categoryId}")
   @PreAuthorize("hasAnyRole('ADMIN')")
-  ResponseEntity<BaseResponse> updateCategory(@Valid @RequestBody CategoryDTO categoryDTO, @RequestParam String categoryId) {
+  ResponseEntity<BaseResponse> updateCategory(@Valid @RequestBody CategoryDTO categoryDTO, @PathVariable String categoryId) {
     return categoryService.updateCategory(categoryDTO,categoryId);
   }
 
-  @DeleteMapping("/delete")
+  @DeleteMapping("/{categoryId}")
   @PreAuthorize("hasAnyRole('ADMIN')")
-  ResponseEntity<BaseResponse> deleteCategory(@RequestParam String categoryId) {
+  ResponseEntity<BaseResponse> deleteCategory(@PathVariable String categoryId) {
     return categoryService.deleteCategory(categoryId);
   }
 }

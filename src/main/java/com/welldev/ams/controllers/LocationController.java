@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,13 +27,13 @@ public class LocationController {
     this.locationService = locationService;
   }
 
-  @PostMapping("/create")
+  @PostMapping
   @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> createLocation(@Valid @RequestBody LocationDTO locationDTO) {
     return locationService.createLocation(locationDTO);
   }
 
-  @GetMapping("/getAll")
+  @GetMapping
   @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> getCategories(
       @RequestParam(required = false) String building,
@@ -46,21 +47,21 @@ public class LocationController {
     return locationService.getLocations(building, floor, roomNumber, city, page, pageSize, sortBy, order);
   }
 
-  @GetMapping("/get")
+  @GetMapping("/{locationId}")
   @PreAuthorize("hasAnyRole('ADMIN')")
-  ResponseEntity<BaseResponse> getCategory(@RequestParam String locationId) {
+  ResponseEntity<BaseResponse> getCategory(@PathVariable String locationId) {
     return locationService.getLocation(locationId);
   }
 
-  @PutMapping("/update")
+  @PutMapping("/{locationId}")
   @PreAuthorize("hasAnyRole('ADMIN')")
-  ResponseEntity<BaseResponse> updateCategory(@Valid @RequestBody LocationDTO locationDTO, @RequestParam String locationId) {
+  ResponseEntity<BaseResponse> updateCategory(@Valid @RequestBody LocationDTO locationDTO, @PathVariable String locationId) {
     return locationService.updateLocation(locationDTO,locationId);
   }
 
-  @DeleteMapping("/delete")
+  @DeleteMapping("/{locationId}")
   @PreAuthorize("hasAnyRole('ADMIN')")
-  ResponseEntity<BaseResponse> deleteCategory(@RequestParam String locationId) {
+  ResponseEntity<BaseResponse> deleteCategory(@PathVariable String locationId) {
     return locationService.deleteLocation(locationId);
   }
 }
