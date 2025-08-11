@@ -47,37 +47,25 @@ public class AssetServiceImpl implements AssetService {
   }
 
   @Override
-  public ResponseEntity<BaseResponse> createAsset(AssetDTO assetDTO) {
-    try {
-      Asset saveEntity = assetRepository.save(assetMapper.categoryDTOToCategoryEntity(assetDTO, categoryRepository, vendorRepository, locationRepository));
-      return ResponseEntity.ok().body(utils.generateResponse(saveEntity, true, HttpStatus.OK.value(), "Asset Created Successfully."));
-    }
-    catch (Exception e) {
-      log.error("Asset Location Error: {}", e);
-      return ResponseEntity.internalServerError().body(utils.generateResponse(null, false, HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-    }
+  public AssetDTO createAsset(AssetDTO assetDTO) {
+    Asset entity = assetMapper.categoryDTOToCategoryEntity(
+        assetDTO, categoryRepository, vendorRepository, locationRepository);
+    Asset savedEntity = assetRepository.save(entity);
+    return assetMapper.entityToDTO(savedEntity);
   }
 
   @Override
-  public ResponseEntity<BaseResponse> updateAsset(AssetDTO assetDTO, String assetId) {
-    try {
-      Optional<Asset> locationEntity = assetRepository.findByIdAndDeleted(UUID.fromString(assetId), false);
-      if(locationEntity.isPresent()) {
-        assetMapper.updateCategoryEntity(assetDTO, locationEntity.get(), categoryRepository, vendorRepository, locationRepository);
-        Asset saveEntity = assetRepository.save(locationEntity.get());
-        return ResponseEntity.ok().body(utils.generateResponse(saveEntity, true, HttpStatus.OK.value(), ""));
-      }
-      return ResponseEntity.notFound().build();
-    }
-    catch (Exception e) {
-      log.error("Asset Location Error: {}", e);
-      return ResponseEntity.internalServerError().body(utils.generateResponse(null, false, HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-    }
+  public Optional<AssetDTO>  updateAsset(AssetDTO assetDTO, String assetId) {
+    return assetRepository.findByIdAndDeleted(UUID.fromString(assetId), false)
+        .map(asset -> {
+          assetMapper.updateEntityFromDTO(assetDTO, asset, categoryRepository, vendorRepository, locationRepository);
+          Asset saved = assetRepository.save(asset);
+          return assetMapper.entityToDTO(saved);
+        });
   }
 
   @Override
-  public ResponseEntity<BaseResponse> getAssets(String serialNumber, String category, String vendor, String location, ZonedDateTime purchaseDateFrom, ZonedDateTime purchaseDateTo, String status, int page, int size, String sortBy, String order) {
-    try {
+  public Page<AssetDTO>  getAssets(String serialNumber, String category, String vendor, String location, ZonedDateTime purchaseDateFrom, ZonedDateTime purchaseDateTo, String status, int page, int size, String sortBy, String order) {
       Specification<Asset> spec = (root, query, cb) -> {
         List<Predicate> predicates = new ArrayList<>();
 
@@ -103,45 +91,29 @@ public class AssetServiceImpl implements AssetService {
         return cb.and(predicates.toArray(new Predicate[0]));
       };
       Page<Asset> assetList = assetRepository.findAll(spec, PageRequest.of(page, size));
-      return ResponseEntity.ok().body(utils.generateResponse(assetList, true, HttpStatus.OK.value(), ""));
-    }
-    catch (Exception e) {
-      log.error("Get Categories Error: {}", e);
-      return ResponseEntity.internalServerError().body(utils.generateResponse(null, false, HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-    }
+      return assetList.map(assetMapper::entityToDTO);
   }
 
   @Override
-  public ResponseEntity<BaseResponse> getAsset(String assetId) {
+  public Optional<AssetDTO>  getAsset(String assetId) {
     try {
-      Optional<Asset> asset = assetRepository.findById(UUID.fromString(assetId));
-      return asset.map(value -> ResponseEntity.ok()
-              .body(utils.generateResponse(value, true, HttpStatus.OK.value(), "")))
-          .orElseGet(() -> ResponseEntity.notFound()
-              .build());
-    }
-    catch (Exception e) {
+      return assetRepository.findById(UUID.fromString(assetId))
+          .map(assetMapper::entityToDTO);
+    } catch (Exception e) {
       log.error("Get Asset Error: {}", assetId, e);
-      return ResponseEntity.internalServerError().body(utils.generateResponse(null, false, HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+      throw e;
     }
   }
 
   @Override
-  public ResponseEntity<BaseResponse> deleteAsset(String assetId) {
-    try {
-      Optional<Asset> asset = assetRepository.findByIdAndActiveAndDeleted(UUID.fromString(assetId), true, false);
-      if(asset.isPresent()) {
-        asset.get().setDeleted(true);
-        assetRepository.save(asset.get());
-        return ResponseEntity.noContent().build();
-      }
-      else{
-        return ResponseEntity.notFound().build();
-      }
+  public boolean deleteAsset(String assetId) {
+    Optional<Asset> asset = assetRepository.findByIdAndActiveAndDeleted(UUID.fromString(assetId), true, false);
+    if (asset.isPresent()) {
+      Asset toDelete = asset.get();
+      toDelete.setDeleted(true);
+      assetRepository.save(toDelete);
+      return true;
     }
-    catch (Exception e) {
-      log.error("Delete Asset Error: {}", assetId, e);
-      return ResponseEntity.internalServerError().body(utils.generateResponse(null, false, HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-    }
+    return false;
   }
 }

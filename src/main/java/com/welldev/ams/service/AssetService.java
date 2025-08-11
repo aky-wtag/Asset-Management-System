@@ -1,20 +1,22 @@
 package com.welldev.ams.service;
 
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
 import com.welldev.ams.model.request.AssetDTO;
 import com.welldev.ams.model.response.BaseResponse;
 
 public interface AssetService {
-  ResponseEntity<BaseResponse> createAsset(AssetDTO assetDTO);
+  AssetDTO createAsset(AssetDTO assetDTO);
 
-  ResponseEntity<BaseResponse> updateAsset(AssetDTO assetDTO, String assetId);
+  Optional<AssetDTO> updateAsset(AssetDTO assetDTO, String assetId);
 
-  ResponseEntity<BaseResponse> getAssets(String serialNumber, String category, String vendor, String location, ZonedDateTime purchaseDateFrom, ZonedDateTime purchaseDateTo, String status, int page, int size, String sortBy, String order);
+  Page<AssetDTO> getAssets(String serialNumber, String category, String vendor, String location, ZonedDateTime purchaseDateFrom, ZonedDateTime purchaseDateTo, String status, int page, int size, String sortBy, String order);
 
-  ResponseEntity<BaseResponse> getAsset(String assetId);
+  Optional<AssetDTO>  getAsset(String assetId);
 
-  ResponseEntity<BaseResponse> deleteAsset(String assetId);
+  boolean deleteAsset(String assetId);
 }

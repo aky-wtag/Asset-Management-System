@@ -21,6 +21,27 @@ import com.welldev.ams.repositories.VendorRepository;
 @Mapper(componentModel = "spring")
 public interface AssetMapper {
 
+  @Mapping(source = "category.name", target = "category")
+  @Mapping(source = "vendor.name", target = "vendor")
+  @Mapping(source = "location.name", target = "location")
+  AssetDTO entityToDTO(Asset asset);
+
+  default void updateEntityFromDTO(AssetDTO dto, @MappingTarget Asset entity,
+      CategoryRepository categoryRepo,
+      VendorRepository vendorRepo,
+      LocationRepository locationRepo) {
+    entity.setName(dto.getName());
+    entity.setSerialNumber(dto.getSerialNumber());
+    entity.setCategory(categoryRepo.findByIdAndActiveAndDeleted(UUID.fromString(dto.getCategory()),true, false)
+        .orElseThrow(() -> new RuntimeException("Category not found")));
+    entity.setVendor(vendorRepo.findByIdAndActiveAndDeleted(UUID.fromString(dto.getVendor()), true, false)
+        .orElseThrow(() -> new RuntimeException("Vendor not found")));
+    entity.setLocation(locationRepo.findByIdAndActiveAndDeleted(UUID.fromString(dto.getLocation()), true, false)
+        .orElseThrow(() -> new RuntimeException("Location not found")));
+    entity.setPurchaseDate(dto.getPurchaseDate());
+    entity.setStatus(dto.getStatus());
+  }
+
   @Mapping(target = "category", ignore = true)
   @Mapping(target = "vendor", ignore = true)
   @Mapping(target = "location", ignore = true)
@@ -30,6 +51,7 @@ public interface AssetMapper {
       @Context VendorRepository vendorRepository,
       @Context LocationRepository locationRepository
   );
+
   @Mapping(target = "category", ignore = true)
   @Mapping(target = "vendor", ignore = true)
   @Mapping(target = "location", ignore = true)
