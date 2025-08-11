@@ -2,24 +2,16 @@ package com.welldev.ams.controllers;
 
 import jakarta.validation.Valid;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.welldev.ams.model.request.LocationDTO;
-import com.welldev.ams.model.response.BaseResponse;
 import com.welldev.ams.service.LocationService;
 
 @RestController
-@RequestMapping("/location")
+@RequestMapping("/locations")
 public class LocationController {
   private final LocationService locationService;
 
@@ -29,39 +21,40 @@ public class LocationController {
 
   @PostMapping
   @PreAuthorize("hasAnyRole('ADMIN')")
-  ResponseEntity<BaseResponse> createLocation(@Valid @RequestBody LocationDTO locationDTO) {
-    return locationService.createLocation(locationDTO);
+  public ResponseEntity<LocationDTO> createLocation(@Valid @RequestBody LocationDTO locationDTO) {
+    LocationDTO created = locationService.createLocation(locationDTO);
+    return ResponseEntity.status(201).body(created);
   }
 
   @GetMapping
-  @PreAuthorize("hasAnyRole('ADMIN')")
-  ResponseEntity<BaseResponse> getCategories(
-      @RequestParam(required = false) String building,
-      @RequestParam(required = false) String floor,
-      @RequestParam(required = false) String roomNumber,
-      @RequestParam(required = false) String city,
+  @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+  public ResponseEntity<Page<LocationDTO>> getLocations(
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "10") int pageSize,
-      @RequestParam(defaultValue = "createdAt") String sortBy,
-      @RequestParam(defaultValue = "desc") String order) {
-    return locationService.getLocations(building, floor, roomNumber, city, page, pageSize, sortBy, order);
+      @RequestParam(defaultValue = "name") String sortBy,
+      @RequestParam(defaultValue = "asc") String order) {
+    Page<LocationDTO> locations = locationService.getLocations(page, pageSize, sortBy, order);
+    return ResponseEntity.ok(locations);
   }
 
   @GetMapping("/{locationId}")
-  @PreAuthorize("hasAnyRole('ADMIN')")
-  ResponseEntity<BaseResponse> getCategory(@PathVariable String locationId) {
-    return locationService.getLocation(locationId);
+  @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+  public ResponseEntity<LocationDTO> getLocation(@PathVariable String locationId) {
+    LocationDTO dto = locationService.getLocation(locationId);
+    return ResponseEntity.ok(dto);
   }
 
   @PutMapping("/{locationId}")
   @PreAuthorize("hasAnyRole('ADMIN')")
-  ResponseEntity<BaseResponse> updateCategory(@Valid @RequestBody LocationDTO locationDTO, @PathVariable String locationId) {
-    return locationService.updateLocation(locationDTO,locationId);
+  public ResponseEntity<LocationDTO> updateLocation(@Valid @RequestBody LocationDTO locationDTO, @PathVariable String locationId) {
+    LocationDTO updated = locationService.updateLocation(locationDTO, locationId);
+    return ResponseEntity.ok(updated);
   }
 
   @DeleteMapping("/{locationId}")
   @PreAuthorize("hasAnyRole('ADMIN')")
-  ResponseEntity<BaseResponse> deleteCategory(@PathVariable String locationId) {
-    return locationService.deleteLocation(locationId);
+  public ResponseEntity<Void> deleteLocation(@PathVariable String locationId) {
+    locationService.deleteLocation(locationId);
+    return ResponseEntity.noContent().build();
   }
 }

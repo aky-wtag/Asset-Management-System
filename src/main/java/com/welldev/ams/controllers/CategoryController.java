@@ -1,27 +1,17 @@
 package com.welldev.ams.controllers;
 
-
 import jakarta.validation.Valid;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.welldev.ams.model.request.AssignmentDTO;
 import com.welldev.ams.model.request.CategoryDTO;
-import com.welldev.ams.model.response.BaseResponse;
 import com.welldev.ams.service.CategoryService;
 
 @RestController
-@RequestMapping("/category")
+@RequestMapping("/categories")
 public class CategoryController {
   private final CategoryService categoryService;
 
@@ -31,36 +21,40 @@ public class CategoryController {
 
   @PostMapping
   @PreAuthorize("hasAnyRole('ADMIN')")
-  ResponseEntity<BaseResponse> createCategory(@Valid @RequestBody CategoryDTO categoryDTO) {
-    return categoryService.createCategory(categoryDTO);
+  public ResponseEntity<CategoryDTO> createCategory(@Valid @RequestBody CategoryDTO categoryDTO) {
+    CategoryDTO created = categoryService.createCategory(categoryDTO);
+    return ResponseEntity.status(201).body(created);
   }
 
   @GetMapping
-  @PreAuthorize("hasAnyRole('ADMIN')")
-  ResponseEntity<BaseResponse> getCategories(
-      @RequestParam(required = false) String categoryName,
+  @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+  public ResponseEntity<Page<CategoryDTO>> getCategories(
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "10") int pageSize,
-      @RequestParam(defaultValue = "createdAt") String sortBy,
-      @RequestParam(defaultValue = "desc") String order) {
-    return categoryService.getCategories(categoryName, page, pageSize, sortBy, order);
+      @RequestParam(defaultValue = "name") String sortBy,
+      @RequestParam(defaultValue = "asc") String order) {
+    Page<CategoryDTO> categories = categoryService.getCategories(page, pageSize, sortBy, order);
+    return ResponseEntity.ok(categories);
   }
 
   @GetMapping("/{categoryId}")
-  @PreAuthorize("hasAnyRole('ADMIN')")
-  ResponseEntity<BaseResponse> getCategory(@PathVariable String categoryId) {
-    return categoryService.getCategory(categoryId);
+  @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+  public ResponseEntity<CategoryDTO> getCategory(@PathVariable String categoryId) {
+    CategoryDTO dto = categoryService.getCategory(categoryId);
+    return ResponseEntity.ok(dto);
   }
 
   @PutMapping("/{categoryId}")
   @PreAuthorize("hasAnyRole('ADMIN')")
-  ResponseEntity<BaseResponse> updateCategory(@Valid @RequestBody CategoryDTO categoryDTO, @PathVariable String categoryId) {
-    return categoryService.updateCategory(categoryDTO,categoryId);
+  public ResponseEntity<CategoryDTO> updateCategory(@Valid @RequestBody CategoryDTO categoryDTO, @PathVariable String categoryId) {
+    CategoryDTO updated = categoryService.updateCategory(categoryDTO, categoryId);
+    return ResponseEntity.ok(updated);
   }
 
   @DeleteMapping("/{categoryId}")
   @PreAuthorize("hasAnyRole('ADMIN')")
-  ResponseEntity<BaseResponse> deleteCategory(@PathVariable String categoryId) {
-    return categoryService.deleteCategory(categoryId);
+  public ResponseEntity<Void> deleteCategory(@PathVariable String categoryId) {
+    categoryService.deleteCategory(categoryId);
+    return ResponseEntity.noContent().build();
   }
 }

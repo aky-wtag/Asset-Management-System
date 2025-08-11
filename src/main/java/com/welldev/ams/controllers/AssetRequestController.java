@@ -4,6 +4,7 @@ import java.time.ZonedDateTime;
 
 import jakarta.validation.Valid;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.welldev.ams.model.request.AssetRequestDTO;
-import com.welldev.ams.model.response.BaseResponse;
 import com.welldev.ams.service.AssetRequestService;
 
 @RestController
@@ -31,13 +31,14 @@ public class AssetRequestController {
 
   @PostMapping
   @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-  ResponseEntity<BaseResponse> createAssetRequest(@Valid @RequestBody AssetRequestDTO assetRequestDTO) {
-    return assetRequestService.createAssetRequest(assetRequestDTO);
+  public ResponseEntity<AssetRequestDTO> createAssetRequest(@Valid @RequestBody AssetRequestDTO assetRequestDTO) {
+    AssetRequestDTO created = assetRequestService.createAssetRequest(assetRequestDTO);
+    return ResponseEntity.status(201).body(created);
   }
 
   @GetMapping
   @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-  ResponseEntity<BaseResponse> getAssetRequests(
+  public ResponseEntity<Page<AssetRequestDTO>> getAssetRequests(
       @RequestParam(required = false) String requestedBy,
       @RequestParam(required = false) String assetName,
       @RequestParam(required = false) String status,
@@ -47,24 +48,28 @@ public class AssetRequestController {
       @RequestParam(defaultValue = "10") int pageSize,
       @RequestParam(defaultValue = "createdAt") String sortBy,
       @RequestParam(defaultValue = "desc") String order) {
-    return assetRequestService.getAssetRequests(requestedBy, assetName, status, requestDateFrom, requestDateTo, page, pageSize, sortBy, order);
+    Page<AssetRequestDTO> requests = assetRequestService.getAssetRequests(requestedBy, assetName, status, requestDateFrom, requestDateTo, page, pageSize, sortBy, order);
+    return ResponseEntity.ok(requests);
   }
 
   @GetMapping("/{assetRequestId}")
   @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-  ResponseEntity<BaseResponse> getAssetRequest(@PathVariable String assetRequestId) {
-    return assetRequestService.getAssetRequest(assetRequestId);
+  public ResponseEntity<AssetRequestDTO> getAssetRequest(@PathVariable String assetRequestId) {
+    AssetRequestDTO dto = assetRequestService.getAssetRequest(assetRequestId);
+    return ResponseEntity.ok(dto);
   }
 
   @PutMapping("/{assetRequestId}")
   @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-  ResponseEntity<BaseResponse> updateAssetRequest(@Valid @RequestBody AssetRequestDTO assetRequestDTO, @PathVariable String assetRequestId) {
-    return assetRequestService.updateAssetRequest(assetRequestDTO,assetRequestId);
+  public ResponseEntity<AssetRequestDTO> updateAssetRequest(@Valid @RequestBody AssetRequestDTO assetRequestDTO, @PathVariable String assetRequestId) {
+    AssetRequestDTO updated = assetRequestService.updateAssetRequest(assetRequestDTO, assetRequestId);
+    return ResponseEntity.ok(updated);
   }
 
   @DeleteMapping("/{assetRequestId}")
   @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-  ResponseEntity<BaseResponse> deleteAssetRequest(@PathVariable String assetRequestId) {
-    return assetRequestService.deleteAssetRequest(assetRequestId);
+  public ResponseEntity<Void> deleteAssetRequest(@PathVariable String assetRequestId) {
+    assetRequestService.deleteAssetRequest(assetRequestId);
+    return ResponseEntity.noContent().build();
   }
 }

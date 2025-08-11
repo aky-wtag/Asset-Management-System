@@ -11,4 +11,6 @@ public interface LocationMapper {
   Location locationDTOToLocationEntity(LocationDTO locationDTO);
 
   void updateLocationEntity(LocationDTO locationDTO, @MappingTarget Location location);
+
+  LocationDTO toDto(Location location);
 }

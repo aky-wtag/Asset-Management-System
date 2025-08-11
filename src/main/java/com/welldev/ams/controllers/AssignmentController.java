@@ -4,20 +4,12 @@ import java.time.ZonedDateTime;
 
 import jakarta.validation.Valid;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.welldev.ams.model.request.AssignmentDTO;
-import com.welldev.ams.model.response.BaseResponse;
 import com.welldev.ams.service.AssignmentService;
 
 @RestController
@@ -30,43 +22,45 @@ public class AssignmentController {
   }
 
   @PostMapping
-  @PreAuthorize("hasAnyRole('ADMIN')")
-  ResponseEntity<BaseResponse> createAssignment(@Valid @RequestBody AssignmentDTO assignmentDTO) {
-    return assignmentService.createAssignment(assignmentDTO);
+  @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+  public ResponseEntity<AssignmentDTO> createAssignment(@Valid @RequestBody AssignmentDTO assignmentDTO) {
+    AssignmentDTO created = assignmentService.createAssignment(assignmentDTO);
+    return ResponseEntity.status(201).body(created);
   }
 
   @GetMapping
-  @PreAuthorize("hasAnyRole('ADMIN')")
-  ResponseEntity<BaseResponse> getAssetRequests(
+  @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+  public ResponseEntity<Page<AssignmentDTO>> getAssignments(
       @RequestParam(required = false) String assetId,
       @RequestParam(required = false) String userId,
-      @RequestParam(required = false) String remarks,
       @RequestParam(required = false) ZonedDateTime assignedDateFrom,
       @RequestParam(required = false) ZonedDateTime assignedDateTo,
-      @RequestParam(required = false) ZonedDateTime returnDateFrom,
-      @RequestParam(required = false) ZonedDateTime returnDateTo,
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "10") int pageSize,
-      @RequestParam(defaultValue = "createdAt") String sortBy,
+      @RequestParam(defaultValue = "assignedDate") String sortBy,
       @RequestParam(defaultValue = "desc") String order) {
-    return assignmentService.getAssignments(assetId, userId, remarks, assignedDateFrom, assignedDateTo, returnDateFrom, returnDateTo, page, pageSize, sortBy, order);
+    Page<AssignmentDTO> assignments = assignmentService.getAssignments(assetId, userId, assignedDateFrom, assignedDateTo, page, pageSize, sortBy, order);
+    return ResponseEntity.ok(assignments);
   }
 
   @GetMapping("/{assignmentId}")
-  @PreAuthorize("hasAnyRole('ADMIN')")
-  ResponseEntity<BaseResponse> getAssignment(@PathVariable String assignmentId) {
-    return assignmentService.getAssignment(assignmentId);
+  @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+  public ResponseEntity<AssignmentDTO> getAssignment(@PathVariable String assignmentId) {
+    AssignmentDTO dto = assignmentService.getAssignment(assignmentId);
+    return ResponseEntity.ok(dto);
   }
 
   @PutMapping("/{assignmentId}")
-  @PreAuthorize("hasAnyRole('ADMIN')")
-  ResponseEntity<BaseResponse> updateAssignment(@Valid @RequestBody AssignmentDTO assignmentDTO, @PathVariable String assignmentId) {
-    return assignmentService.updateAssignment(assignmentDTO,assignmentId);
+  @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+  public ResponseEntity<AssignmentDTO> updateAssignment(@Valid @RequestBody AssignmentDTO assignmentDTO, @PathVariable String assignmentId) {
+    AssignmentDTO updated = assignmentService.updateAssignment(assignmentDTO, assignmentId);
+    return ResponseEntity.ok(updated);
   }
 
   @DeleteMapping("/{assignmentId}")
-  @PreAuthorize("hasAnyRole('ADMIN')")
-  ResponseEntity<BaseResponse> deleteAssignment(@PathVariable String assignmentId) {
-    return assignmentService.deleteAssignment(assignmentId);
+  @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+  public ResponseEntity<Void> deleteAssignment(@PathVariable String assignmentId) {
+    assignmentService.deleteAssignment(assignmentId);
+    return ResponseEntity.noContent().build();
   }
 }

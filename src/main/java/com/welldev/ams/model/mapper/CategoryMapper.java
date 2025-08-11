@@ -11,4 +11,6 @@ public interface CategoryMapper {
   Category categoryDTOToCategoryEntity(CategoryDTO categoryDTO);
 
   void updateCategoryEntity(CategoryDTO categoryDTO, @MappingTarget Category category);
+
+  CategoryDTO toDto(Category category);
 }

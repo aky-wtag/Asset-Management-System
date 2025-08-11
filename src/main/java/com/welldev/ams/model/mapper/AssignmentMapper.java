@@ -10,4 +10,5 @@ import com.welldev.ams.model.request.AssignmentDTO;
 public interface AssignmentMapper {
   Assignment toEntity(AssignmentDTO assignmentDTO);
   void updateEntity(AssignmentDTO assignmentDTO, @MappingTarget Assignment assignment);
+  AssignmentDTO toDto(Assignment assignment);
 }

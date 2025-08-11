@@ -2,19 +2,18 @@ package com.welldev.ams.service;
 
 import java.time.ZonedDateTime;
 
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
 
 import com.welldev.ams.model.request.AssignmentDTO;
-import com.welldev.ams.model.response.BaseResponse;
 
 public interface AssignmentService {
-  ResponseEntity<BaseResponse> createAssignment(AssignmentDTO assignmentDTO);
+  AssignmentDTO createAssignment(AssignmentDTO assignmentDTO);
 
-  ResponseEntity<BaseResponse> updateAssignment(AssignmentDTO assignmentDTO, String assignmentId);
+  AssignmentDTO updateAssignment(AssignmentDTO assignmentDTO, String assignmentId);
 
-  ResponseEntity<BaseResponse> getAssignments(String assetId, String userId, String remarks, ZonedDateTime assignedDateFrom, ZonedDateTime assignedDateTo, ZonedDateTime returnDateFrom, ZonedDateTime returnDateTo, int page, int size, String sortBy, String order);
+  Page<AssignmentDTO> getAssignments(String assetId, String userId, ZonedDateTime assignedDateFrom, ZonedDateTime assignedDateTo, int page, int size, String sortBy, String order);
 
-  ResponseEntity<BaseResponse> getAssignment(String assignmentId);
+  AssignmentDTO getAssignment(String assignmentId);
 
-  ResponseEntity<BaseResponse> deleteAssignment(String assignmentId);
+  void deleteAssignment(String assignmentId);
 }

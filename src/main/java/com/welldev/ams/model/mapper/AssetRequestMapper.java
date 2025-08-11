@@ -16,4 +16,8 @@ public interface AssetRequestMapper {
   @Mapping(target = "requestedBy", source = "requestedBy", qualifiedByName = "mapRequestedBy")
   @Mapping(target = "assetName", source = "assetId")
   void updateEntity(AssetRequestDTO assetRequestDTO, @MappingTarget AssetRequest assetRequest);
+
+  @Mapping(target = "requestedBy", source = "requestedBy.id")
+  @Mapping(target = "assetId", source = "assetName")
+  AssetRequestDTO toDto(AssetRequest assetRequest);
 }
