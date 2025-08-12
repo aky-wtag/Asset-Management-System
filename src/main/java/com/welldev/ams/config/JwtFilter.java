@@ -1,6 +1,7 @@
 package com.welldev.ams.config;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -9,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,10 +28,12 @@ import com.welldev.ams.service.JWTService;
 public class JwtFilter extends OncePerRequestFilter {
   private final JWTService jwtService;
   private final UserRepository authUserRepository;
+  private final RedisTemplate<String, Object> redisTemplate;
 
-  public JwtFilter(@Lazy JWTService jwtService, @Lazy UserRepository authUserRepository) {
+  public JwtFilter(@Lazy JWTService jwtService, @Lazy UserRepository authUserRepository, RedisTemplate<String, Object> redisTemplate) {
     this.jwtService = jwtService;
     this.authUserRepository = authUserRepository;
+    this.redisTemplate = redisTemplate;
   }
 
   @Override
@@ -52,13 +56,16 @@ public class JwtFilter extends OncePerRequestFilter {
         .getAuthentication() == null)
     {
       UserDetails userDetails = userDetailsService().loadUserByUsername(username);
-
-      if (jwtService.validateToken(jwt, userDetails)) {
+      boolean exists = Boolean.TRUE.equals(redisTemplate.hasKey(userDetails.getUsername()));
+      if (exists && jwtService.validateToken(jwt, userDetails)) {
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null,
             userDetails.getAuthorities());
         authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext()
             .setAuthentication(authToken);
+      }
+      else {
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid Token");
       }
     }
     filterChain.doFilter(request, response);
