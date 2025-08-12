@@ -8,13 +8,12 @@ import java.util.Set;
 import java.util.UUID;
 
 import jakarta.persistence.criteria.Predicate;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -23,13 +22,13 @@ import com.welldev.ams.model.db.Role;
 import com.welldev.ams.model.db.Users;
 import com.welldev.ams.model.mapper.UsersMapper;
 import com.welldev.ams.model.request.UserDTO;
-import com.welldev.ams.model.response.BaseResponse;
 import com.welldev.ams.repositories.RoleRepository;
 import com.welldev.ams.repositories.UserRepository;
 import com.welldev.ams.service.UsersService;
 
 @Slf4j
 @Service
+@Transactional
 public class UsersServiceImpl implements UsersService {
   private final UserRepository userRepository;
   private final UsersMapper usersMapper;

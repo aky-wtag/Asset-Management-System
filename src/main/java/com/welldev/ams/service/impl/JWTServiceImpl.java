@@ -9,6 +9,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,6 +20,7 @@ import com.welldev.ams.service.JWTService;
 
 @Slf4j
 @Service
+@Transactional
 public class JWTServiceImpl implements JWTService {
 
   private final String SECRET_KEY = "your-super-secret-key-that-is-long-and-secure";

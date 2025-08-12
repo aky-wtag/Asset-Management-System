@@ -6,24 +6,23 @@ import java.util.Optional;
 import java.util.UUID;
 
 import jakarta.persistence.criteria.Predicate;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.welldev.ams.model.db.Vendor;
 import com.welldev.ams.model.mapper.VendorMapper;
 import com.welldev.ams.model.request.VendorDTO;
-import com.welldev.ams.model.response.BaseResponse;
 import com.welldev.ams.repositories.VendorRepository;
 import com.welldev.ams.service.VendorService;
 
 @Slf4j
 @Service
+@Transactional
 public class VendorServiceImpl implements VendorService {
   private final VendorRepository vendorRepository;
   private final VendorMapper vendorMapper;

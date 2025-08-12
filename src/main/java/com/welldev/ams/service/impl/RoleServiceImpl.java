@@ -3,6 +3,7 @@ package com.welldev.ams.service.impl;
 import java.util.Optional;
 import java.util.UUID;
 
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.data.domain.Page;
@@ -19,6 +20,7 @@ import com.welldev.ams.service.RoleService;
 
 @Slf4j
 @Service
+@Transactional
 public class RoleServiceImpl implements RoleService {
   private final RoleRepository roleRepository;
   private final RoleMapper roleMapper;

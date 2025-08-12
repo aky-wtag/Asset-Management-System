@@ -26,7 +26,7 @@ public class AuthController {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<BaseResponse> createAuthenticationToken(@RequestBody LogInDTO logInDTO) throws Exception {
+  public ResponseEntity<BaseResponse> createAuthenticationToken(@RequestBody LogInDTO logInDTO) {
     AuthResponse ar = authService.signIn(logInDTO.getEmail(), logInDTO.getPassword());
     return ResponseEntity.ok(utils.generateResponse(ar,true, HttpStatus.OK.value(), "Sign in successful"));
   }

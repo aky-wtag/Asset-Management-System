@@ -2,6 +2,7 @@ package com.welldev.ams.service.impl;
 
 import java.util.Optional;
 
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.data.redis.core.RedisTemplate;
@@ -16,10 +17,10 @@ import com.welldev.ams.model.request.AuthResponse;
 import com.welldev.ams.repositories.UserRepository;
 import com.welldev.ams.service.AuthService;
 import com.welldev.ams.service.JWTService;
-import com.welldev.ams.utils.Utils;
 
 @Slf4j
 @Service
+@Transactional
 public class AuthServiceImpl implements AuthService {
   private final AuthenticationManager authenticationManager;
   private final UserRepository userRepository;

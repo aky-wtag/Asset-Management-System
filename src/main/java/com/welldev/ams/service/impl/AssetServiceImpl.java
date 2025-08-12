@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import jakarta.persistence.criteria.Predicate;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.data.domain.Page;
@@ -27,6 +28,7 @@ import com.welldev.ams.utils.Utils;
 
 @Slf4j
 @Service
+@Transactional
 public class AssetServiceImpl implements AssetService {
   private final AssetRepository assetRepository;
   private final CategoryRepository categoryRepository;

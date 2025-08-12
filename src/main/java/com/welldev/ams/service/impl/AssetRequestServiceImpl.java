@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import jakarta.persistence.criteria.Predicate;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.data.domain.Page;
@@ -22,6 +23,7 @@ import com.welldev.ams.service.AssetRequestService;
 
 @Slf4j
 @Service
+@Transactional
 public class AssetRequestServiceImpl implements AssetRequestService {
   private final AssetRequestRepository assetRequestRepository;
   private final AssetRequestMapper assetRequestMapper;

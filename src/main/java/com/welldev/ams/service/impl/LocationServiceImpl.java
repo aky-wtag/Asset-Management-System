@@ -3,6 +3,7 @@ package com.welldev.ams.service.impl;
 import java.util.Optional;
 import java.util.UUID;
 
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.data.domain.Page;
@@ -18,6 +19,7 @@ import com.welldev.ams.service.LocationService;
 
 @Slf4j
 @Service
+@Transactional
 public class LocationServiceImpl implements LocationService {
   private final LocationRepository locationRepository;
   private final LocationMapper locationMapper;
