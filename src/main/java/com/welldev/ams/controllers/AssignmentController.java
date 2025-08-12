@@ -5,32 +5,37 @@ import java.time.ZonedDateTime;
 import jakarta.validation.Valid;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.welldev.ams.model.request.AssignmentDTO;
+import com.welldev.ams.model.response.BaseResponse;
 import com.welldev.ams.service.AssignmentService;
+import com.welldev.ams.utils.Utils;
 
 @RestController
 @RequestMapping("/assignments")
 public class AssignmentController {
   private final AssignmentService assignmentService;
+  private final Utils utils;
 
-  public AssignmentController(AssignmentService assignmentService) {
+  public AssignmentController(AssignmentService assignmentService, Utils utils) {
     this.assignmentService = assignmentService;
+    this.utils = utils;
   }
 
   @PostMapping
   @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-  public ResponseEntity<AssignmentDTO> createAssignment(@Valid @RequestBody AssignmentDTO assignmentDTO) {
+  public ResponseEntity<BaseResponse> createAssignment(@Valid @RequestBody AssignmentDTO assignmentDTO) {
     AssignmentDTO created = assignmentService.createAssignment(assignmentDTO);
-    return ResponseEntity.status(201).body(created);
+    return ResponseEntity.status(HttpStatus.CREATED.value()).body(utils.generateResponse(created,true, HttpStatus.CREATED.value(), "Assignment Created Successfully"));
   }
 
   @GetMapping
   @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-  public ResponseEntity<Page<AssignmentDTO>> getAssignments(
+  public ResponseEntity<BaseResponse> getAssignments(
       @RequestParam(required = false) String assetId,
       @RequestParam(required = false) String userId,
       @RequestParam(required = false) ZonedDateTime assignedDateFrom,
@@ -40,21 +45,21 @@ public class AssignmentController {
       @RequestParam(defaultValue = "assignedDate") String sortBy,
       @RequestParam(defaultValue = "desc") String order) {
     Page<AssignmentDTO> assignments = assignmentService.getAssignments(assetId, userId, assignedDateFrom, assignedDateTo, page, pageSize, sortBy, order);
-    return ResponseEntity.ok(assignments);
+    return ResponseEntity.status(HttpStatus.OK.value()).body(utils.generateResponse(assignments,true, HttpStatus.OK.value(), ""));
   }
 
   @GetMapping("/{assignmentId}")
   @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-  public ResponseEntity<AssignmentDTO> getAssignment(@PathVariable String assignmentId) {
+  public ResponseEntity<BaseResponse> getAssignment(@PathVariable String assignmentId) {
     AssignmentDTO dto = assignmentService.getAssignment(assignmentId);
-    return ResponseEntity.ok(dto);
+    return ResponseEntity.status(HttpStatus.OK.value()).body(utils.generateResponse(dto,true, HttpStatus.OK.value(), ""));
   }
 
   @PutMapping("/{assignmentId}")
   @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-  public ResponseEntity<AssignmentDTO> updateAssignment(@Valid @RequestBody AssignmentDTO assignmentDTO, @PathVariable String assignmentId) {
+  public ResponseEntity<BaseResponse> updateAssignment(@Valid @RequestBody AssignmentDTO assignmentDTO, @PathVariable String assignmentId) {
     AssignmentDTO updated = assignmentService.updateAssignment(assignmentDTO, assignmentId);
-    return ResponseEntity.ok(updated);
+    return ResponseEntity.status(HttpStatus.OK.value()).body(utils.generateResponse(updated,true, HttpStatus.OK.value(), "Assignment Updated Successfully"));
   }
 
   @DeleteMapping("/{assignmentId}")

@@ -15,122 +15,93 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.welldev.ams.model.db.Location;
-import com.welldev.ams.model.db.Role;
 import com.welldev.ams.model.db.Vendor;
 import com.welldev.ams.model.mapper.VendorMapper;
 import com.welldev.ams.model.request.VendorDTO;
 import com.welldev.ams.model.response.BaseResponse;
 import com.welldev.ams.repositories.VendorRepository;
 import com.welldev.ams.service.VendorService;
-import com.welldev.ams.utils.Utils;
 
 @Slf4j
 @Service
 public class VendorServiceImpl implements VendorService {
   private final VendorRepository vendorRepository;
-  private final Utils utils;
   private final VendorMapper vendorMapper;
 
-  public VendorServiceImpl(VendorRepository vendorRepository, Utils utils, VendorMapper vendorMapper) {
+  public VendorServiceImpl(VendorRepository vendorRepository, VendorMapper vendorMapper) {
     this.vendorRepository = vendorRepository;
-    this.utils = utils;
     this.vendorMapper = vendorMapper;
   }
 
   @Override
-  public ResponseEntity<BaseResponse> createVendor(VendorDTO vendorDTO) {
-    try {
-      Vendor saveEntity = vendorRepository.save(vendorMapper.vendorToEntity(vendorDTO));
-      return ResponseEntity.ok().body(utils.generateResponse(saveEntity, true, HttpStatus.OK.value(), "Vendor Created Successfully."));
+  public VendorDTO createVendor(VendorDTO vendorDTO) {
+    Vendor saveEntity = vendorRepository.save(vendorMapper.vendorToEntity(vendorDTO));
+    return vendorMapper.toDto(saveEntity);
+  }
+
+  @Override
+  public VendorDTO updateVendor(VendorDTO vendorDTO, String vendorId) {
+    Optional<Vendor> entity = vendorRepository.findByIdAndActiveAndDeleted(UUID.fromString(vendorId), true, false);
+    if (entity.isPresent()) {
+      vendorMapper.updateVendor(vendorDTO, entity.get());
+      Vendor saveEntity = vendorRepository.save(entity.get());
+      return vendorMapper.toDto(saveEntity);
     }
-    catch (Exception e) {
-      log.error("Create Vendor Error: {}", e);
-      return ResponseEntity.internalServerError().body(utils.generateResponse(null, false, HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+    else {
+      throw new RuntimeException("Vendor not found");
     }
   }
 
   @Override
-  public ResponseEntity<BaseResponse> updateVendor(VendorDTO vendorDTO, String vendorId) {
-    try {
-      Optional<Vendor> entity = vendorRepository.findByIdAndActiveAndDeleted(UUID.fromString(vendorId), true, false);
-      if(entity.isPresent()) {
-        vendorMapper.updateVendor(vendorDTO, entity.get());
-        Vendor saveEntity = vendorRepository.save(entity.get());
-        return ResponseEntity.ok().body(utils.generateResponse(saveEntity, true, HttpStatus.OK.value(), ""));
+  public Page<VendorDTO> getVendors(String name, String contactPerson, String email, String phone, int page, int size,
+      String sortBy, String order)
+  {
+    Specification<Vendor> spec = (root, query, cb) -> {
+      List<Predicate> predicates = new ArrayList<>();
+
+      if (name != null && !name.isEmpty()) {
+        predicates.add(cb.like(root.get("name"), "%" + name + "%"));
       }
-      return ResponseEntity.notFound().build();
-    }
-    catch (Exception e) {
-      log.error("Update Vendor Error: {}", e);
-      return ResponseEntity.internalServerError().body(utils.generateResponse(null, false, HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-    }
-  }
-
-  @Override
-  public ResponseEntity<BaseResponse> getVendors(String name, String contactPerson, String email, String phone, int page, int size, String sortBy, String order) {
-    try {
-      Specification<Vendor> spec = (root, query, cb) -> {
-        List<Predicate> predicates = new ArrayList<>();
-
-        if (name != null && !name.isEmpty()) {
-          predicates.add(cb.like(root.get("name"), "%"+name+"%"));
-        }
-        if (contactPerson != null && !contactPerson.isEmpty()) {
-          predicates.add(cb.equal(root.get("contactPerson"), contactPerson));
-        }
-        if (email != null && !email.isEmpty()) {
-          predicates.add(cb.equal(root.get("email"), email));
-        }
-        if (phone != null && !phone.isEmpty()) {
-          predicates.add(cb.equal(root.get("phone"), phone));
-        }
-
-        predicates.add(cb.equal(root.get("active"), true));
-        predicates.add(cb.equal(root.get("deleted"), false));
-
-        return cb.and(predicates.toArray(new Predicate[0]));
-      };
-      Page<Vendor> vendorList = vendorRepository.findAll(spec, PageRequest.of(page, size));
-      return ResponseEntity.ok().body(utils.generateResponse(vendorList, true, HttpStatus.OK.value(), ""));
-    }
-    catch (Exception e) {
-      log.error("Get Users Error: {}", e);
-      return ResponseEntity.internalServerError().body(utils.generateResponse(null, false, HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-    }
-  }
-
-  @Override
-  public ResponseEntity<BaseResponse> getVendor(String vendorId) {
-    try {
-      Optional<Vendor> vendor = vendorRepository.findById(UUID.fromString(vendorId));
-      return vendor.map(value -> ResponseEntity.ok()
-              .body(utils.generateResponse(value, true, HttpStatus.OK.value(), "")))
-          .orElseGet(() -> ResponseEntity.notFound()
-              .build());
-    }
-    catch (Exception e) {
-      log.error("Get Vendor Error: {}", vendorId, e);
-      return ResponseEntity.internalServerError().body(utils.generateResponse(null, false, HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-    }
-  }
-
-  @Override
-  public ResponseEntity<BaseResponse> deleteVendor(String vendorId) {
-    try {
-      Optional<Vendor> vendor = vendorRepository.findByIdAndActiveAndDeleted(UUID.fromString(vendorId), true, false);
-      if(vendor.isPresent()) {
-        vendor.get().setDeleted(true);
-        vendorRepository.save(vendor.get());
-        return ResponseEntity.noContent().build();
+      if (contactPerson != null && !contactPerson.isEmpty()) {
+        predicates.add(cb.equal(root.get("contactPerson"), contactPerson));
       }
-      else{
-        return ResponseEntity.notFound().build();
+      if (email != null && !email.isEmpty()) {
+        predicates.add(cb.equal(root.get("email"), email));
       }
+      if (phone != null && !phone.isEmpty()) {
+        predicates.add(cb.equal(root.get("phone"), phone));
+      }
+
+      predicates.add(cb.equal(root.get("active"), true));
+      predicates.add(cb.equal(root.get("deleted"), false));
+
+      return cb.and(predicates.toArray(new Predicate[0]));
+    };
+    Page<Vendor> vendorList = vendorRepository.findAll(spec, PageRequest.of(page, size));
+    return vendorList.map(vendorMapper::toDto);
+  }
+
+  @Override
+  public VendorDTO getVendor(String vendorId) {
+    Optional<Vendor> vendor = vendorRepository.findById(UUID.fromString(vendorId));
+    if (vendor.isPresent()) {
+      return vendorMapper.toDto(vendor.get());
     }
-    catch (Exception e) {
-      log.error("Delete Vendor Error: {}", vendorId, e);
-      return ResponseEntity.internalServerError().body(utils.generateResponse(null, false, HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+    else {
+      throw new RuntimeException("Vendor not found");
+    }
+  }
+
+  @Override
+  public void deleteVendor(String vendorId) {
+    Optional<Vendor> vendor = vendorRepository.findByIdAndActiveAndDeleted(UUID.fromString(vendorId), true, false);
+    if (vendor.isPresent()) {
+      vendor.get()
+          .setDeleted(true);
+      vendorRepository.save(vendor.get());
+    }
+    else {
+      throw new RuntimeException("Vendor not found");
     }
   }
 }

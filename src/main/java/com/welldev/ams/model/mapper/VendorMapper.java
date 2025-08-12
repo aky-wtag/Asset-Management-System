@@ -12,4 +12,6 @@ public interface VendorMapper {
   Vendor vendorToEntity(VendorDTO vendorDTO);
 
   void updateVendor(VendorDTO vendorDTO, @MappingTarget Vendor vendor);
+
+  VendorDTO toDto(Vendor vendor);
 }

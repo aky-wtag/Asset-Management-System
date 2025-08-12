@@ -1,18 +1,20 @@
 package com.welldev.ams.service;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
+import com.welldev.ams.model.db.Users;
 import com.welldev.ams.model.request.UserDTO;
 import com.welldev.ams.model.response.BaseResponse;
 
 public interface UsersService {
-  ResponseEntity<BaseResponse> createUser(UserDTO userDTO);
+  UserDTO createUser(UserDTO userDTO);
 
-  ResponseEntity<BaseResponse> updateUser(UserDTO userDTO, String userId);
+  UserDTO updateUser(UserDTO userDTO, String userId);
 
-  ResponseEntity<BaseResponse> getUsers(String username, String email, String department, int page, int size, String sortBy, String order);
+  Page<UserDTO> getUsers(String username, String email, String department, int page, int size, String sortBy, String order);
 
-  ResponseEntity<BaseResponse> getUser(String userId);
+  UserDTO getUser(String userId);
 
-  ResponseEntity<BaseResponse> deleteUser(String userId);
+  void deleteUser(String userId);
 }

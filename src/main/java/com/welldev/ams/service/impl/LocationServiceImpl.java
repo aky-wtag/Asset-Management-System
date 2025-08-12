@@ -66,7 +66,8 @@ public class LocationServiceImpl implements LocationService {
   public void deleteLocation(String locationId) {
     Optional<Location> location = locationRepository.findById(UUID.fromString(locationId));
     if (location.isPresent()) {
-      locationRepository.delete(location.get());
+      location.get().setDeleted(true);
+      locationRepository.save(location.get());
     } else {
       throw new RuntimeException("Location not found");
     }
