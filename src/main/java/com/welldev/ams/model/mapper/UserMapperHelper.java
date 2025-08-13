@@ -1,5 +1,7 @@
 package com.welldev.ams.model.mapper;
 
+import java.util.UUID;
+
 import org.mapstruct.Named;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +18,7 @@ public class UserMapperHelper {
 
   @Named("mapRequestedBy")
   public Users mapRequestedBy(String usernameOrId) {
-    return userRepository.findByEmail(usernameOrId)
+    return userRepository.findById(UUID.fromString(usernameOrId))
         .orElseThrow(() -> new IllegalArgumentException("User not found: " + usernameOrId));
   }
 }

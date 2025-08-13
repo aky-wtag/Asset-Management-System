@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.welldev.ams.model.dto.UserResponseDto;
 import com.welldev.ams.model.request.UserDTO;
 import com.welldev.ams.model.response.BaseResponse;
 import com.welldev.ams.service.UsersService;
@@ -34,7 +35,7 @@ public class UserController {
   @PostMapping
   @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> createUser(@Valid @RequestBody UserDTO userDTO) {
-    UserDTO user = usersService.createUser(userDTO);
+    UserResponseDto user = usersService.createUser(userDTO);
     return ResponseEntity.status(HttpStatus.OK.value()).body(utils.generateResponse(user,true, HttpStatus.OK.value(), "User Created Successfully"));
   }
 
@@ -48,21 +49,21 @@ public class UserController {
       @RequestParam(defaultValue = "10") int pageSize,
       @RequestParam(defaultValue = "createdAt") String sortBy,
       @RequestParam(defaultValue = "desc") String order) {
-    Page<UserDTO> users =  usersService.getUsers(username, email, department, page, pageSize, sortBy, order);
+    Page<UserResponseDto> users =  usersService.getUsers(username, email, department, page, pageSize, sortBy, order);
     return ResponseEntity.status(HttpStatus.OK.value()).body(utils.generateResponse(users,true, HttpStatus.OK.value(), ""));
   }
 
   @GetMapping("/{userId}")
   @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> getUser(@PathVariable String userId) {
-    UserDTO user =  usersService.getUser(userId);
+    UserResponseDto user =  usersService.getUser(userId);
     return ResponseEntity.status(HttpStatus.OK.value()).body(utils.generateResponse(user,true, HttpStatus.OK.value(), ""));
   }
 
   @PutMapping("/{userId}")
   @PreAuthorize("hasAnyRole('ADMIN')")
   ResponseEntity<BaseResponse> updateUser(@Valid @RequestBody UserDTO userDTO, @PathVariable String userId) {
-    UserDTO updated =  usersService.updateUser(userDTO,userId);
+    UserResponseDto updated =  usersService.updateUser(userDTO,userId);
     return ResponseEntity.status(HttpStatus.OK.value()).body(utils.generateResponse(updated,true, HttpStatus.OK.value(), "User Updated"));
   }
 

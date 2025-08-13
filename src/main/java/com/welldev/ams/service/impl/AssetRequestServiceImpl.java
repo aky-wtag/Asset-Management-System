@@ -13,9 +13,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.welldev.ams.model.db.AssetRequest;
+import com.welldev.ams.model.db.Users;
 import com.welldev.ams.model.mapper.AssetRequestMapper;
 import com.welldev.ams.model.request.AssetRequestDTO;
 import com.welldev.ams.repositories.AssetRequestRepository;
@@ -41,6 +46,7 @@ public class AssetRequestServiceImpl implements AssetRequestService {
   }
 
   @Override
+  @PreAuthorize("@permissionCheck.isOwnerOrAdmin(#assetRequestId)")
   public AssetRequestDTO updateAssetRequest(AssetRequestDTO assetRequestDTO, String assetRequestId) {
     Optional<AssetRequest> optional = assetRequestRepository.findByIdAndActiveAndDeleted(UUID.fromString(assetRequestId), true, false);
     if (optional.isPresent()) {
@@ -49,24 +55,32 @@ public class AssetRequestServiceImpl implements AssetRequestService {
       AssetRequest saved = assetRequestRepository.save(entity);
       return assetRequestMapper.toDto(saved);
     }
-    throw new RuntimeException("Asset Request not found");
+    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Asset Request not found");
   }
 
   @Override
   public Page<AssetRequestDTO> getAssetRequests(String requestedBy, String assetName, String status,
       ZonedDateTime requestDateFrom, ZonedDateTime requestDateTo, int page, int size, String sortBy, String order) {
+    Users currentUser = (Users) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     Specification<AssetRequest> spec = (root, query, cb) -> {
       List<Predicate> predicates = new ArrayList<>();
 
       if (requestedBy != null && !requestedBy.isEmpty()) {
-        predicates.add(cb.equal(root.get("requestedBy"), requestedBy));
+        predicates.add(cb.equal(root.get("requestedBy").get("id"), UUID.fromString(requestedBy)));
       }
+
+      if (currentUser.getRoles().stream().anyMatch(role -> role.getName().equals("ROLE_USER"))) {
+        predicates.add(cb.equal(root.get("requestedBy").get("id"), currentUser.getId()));
+      }
+
       if (assetName != null && !assetName.isEmpty()) {
         predicates.add(cb.equal(root.get("assetName"), assetName));
       }
+
       if (requestDateFrom != null && requestDateTo != null) {
-        predicates.add(cb.between(root.get("purchaseDate"), requestDateFrom, requestDateTo));
+        predicates.add(cb.between(root.get("requestDate"), requestDateFrom, requestDateTo));
       }
+
       if (status != null && !status.isEmpty()) {
         predicates.add(cb.equal(root.get("status"), status));
       }

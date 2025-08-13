@@ -20,6 +20,7 @@ import org.springframework.util.StringUtils;
 
 import com.welldev.ams.model.db.Role;
 import com.welldev.ams.model.db.Users;
+import com.welldev.ams.model.dto.UserResponseDto;
 import com.welldev.ams.model.mapper.UsersMapper;
 import com.welldev.ams.model.request.UserDTO;
 import com.welldev.ams.repositories.RoleRepository;
@@ -43,7 +44,7 @@ public class UsersServiceImpl implements UsersService {
   }
 
   @Override
-  public UserDTO createUser(UserDTO userDTO) {
+  public UserResponseDto createUser(UserDTO userDTO) {
       Optional<Users> existingUser = userRepository.findByEmail(userDTO.getEmail());
       if (existingUser.isPresent()){
         throw new RuntimeException("User already exists");
@@ -63,7 +64,7 @@ public class UsersServiceImpl implements UsersService {
   }
 
   @Override
-  public UserDTO updateUser(UserDTO userDTO, String userId) {
+  public UserResponseDto updateUser(UserDTO userDTO, String userId) {
       Optional<Users> entity = userRepository.findByIdAndActiveAndDeleted(UUID.fromString(userId), true, false);
       if(entity.isPresent()) {
         usersMapper.updateUserFromDto(userDTO, entity.get());
@@ -86,7 +87,7 @@ public class UsersServiceImpl implements UsersService {
   }
 
   @Override
-  public Page<UserDTO> getUsers(String username, String email, String department, int page,
+  public Page<UserResponseDto> getUsers(String username, String email, String department, int page,
       int size, String sortBy, String order)
   {
       Specification<Users> spec = (root, query, cb) -> {
@@ -109,7 +110,7 @@ public class UsersServiceImpl implements UsersService {
   }
 
   @Override
-  public UserDTO getUser(String userId) {
+  public UserResponseDto getUser(String userId) {
       Optional<Users> user = userRepository.findById(UUID.fromString(userId));
 if(user.isPresent()){
     return usersMapper.toDto(user.get());

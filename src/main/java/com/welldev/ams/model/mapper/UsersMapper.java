@@ -8,6 +8,7 @@ import org.mapstruct.MappingTarget;
 
 import com.welldev.ams.model.db.Role;
 import com.welldev.ams.model.db.Users;
+import com.welldev.ams.model.dto.UserResponseDto;
 import com.welldev.ams.model.request.UserDTO;
 
 @Mapper(componentModel = "spring")
@@ -28,7 +29,7 @@ public interface UsersMapper {
   }
 
   @Mapping(target = "role", expression = "java(mapRolesToString(user.getRoles()))")
-  UserDTO toDto(Users user);
+  UserResponseDto toDto(Users user);
 }
 
 
